@@ -240,11 +240,8 @@ void loop() {
       dvd_x += dvd_dx;
       dvd_y += dvd_dy;
 
-      // Check collision with screen edges
-      // Text size 2 is approx 36x16 pixels for "DVD"
       if (dvd_x <= 0 || dvd_x >= SCREEN_WIDTH - 36) {
         dvd_dx = -dvd_dx;
-        // Clamp position to stay within screen
         if (dvd_x < 0)
           dvd_x = 0;
         if (dvd_x > SCREEN_WIDTH - 36)
