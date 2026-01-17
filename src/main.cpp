@@ -62,6 +62,28 @@ void setBrightness(uint8_t value) {
   display.ssd1306_command(value);
 }
 
+struct LenWords {
+  int x;
+  int y;
+  int speed;
+  int size;
+  int c[10];
+};
+
+LenWords lenWord[16];
+
+void setLenWords() {
+  for (int i = 0; i < 16; i++) {
+    lenWord[i].speed = random(2, 3);
+    lenWord[i].size = random(5, 10);
+    for (int j = 0; j < lenWord[i].size; j++) {
+      lenWord[i].c[j] = random(0, 2) ? '1' : '0';
+    }
+    lenWord[i].x = random(0, 128);
+    lenWord[i].y = 64;
+  }
+}
+
 // 天気APIからデータを取得する
 void getWeatherData() {
   String url = "http://api.openweathermap.org/data/2.5/weather?q=";
@@ -110,7 +132,7 @@ void pressButton(int command) {
   }
   if (command == SCREEN_SAVER) {
     if (mode == SCREEN_SAVER) {
-      if (screenSaverMode >= 0) {
+      if (screenSaverMode >= MAX_SCREEN_SAVER_MODE) {
         screenSaverMode = 0;
       } else {
         screenSaverMode++;
@@ -172,6 +194,7 @@ void setup() {
   display.clearDisplay();
   display.display();
   HTTPClient http;
+  setLenWords();
   getWeatherData();
 }
 
@@ -222,14 +245,18 @@ void loop() {
       if (dvd_x <= 0 || dvd_x >= SCREEN_WIDTH - 36) {
         dvd_dx = -dvd_dx;
         // Clamp position to stay within screen
-        if (dvd_x < 0) dvd_x = 0;
-        if (dvd_x > SCREEN_WIDTH - 36) dvd_x = SCREEN_WIDTH - 36;
+        if (dvd_x < 0)
+          dvd_x = 0;
+        if (dvd_x > SCREEN_WIDTH - 36)
+          dvd_x = SCREEN_WIDTH - 36;
       }
 
       if (dvd_y <= 0 || dvd_y >= SCREEN_HEIGHT - 16) {
         dvd_dy = -dvd_dy;
-        if (dvd_y < 0) dvd_y = 0;
-        if (dvd_y > SCREEN_HEIGHT - 16) dvd_y = SCREEN_HEIGHT - 16;
+        if (dvd_y < 0)
+          dvd_y = 0;
+        if (dvd_y > SCREEN_HEIGHT - 16)
+          dvd_y = SCREEN_HEIGHT - 16;
       }
 
       display.setTextSize(2);
@@ -237,6 +264,22 @@ void loop() {
       display.print("DVD");
 
       delay(100);
+    }
+    if (screenSaverMode == 1) {
+      for (int i = 0; i < 16; i++) {
+        display.setTextSize(1);
+        if (lenWord[i].y > 64) {
+          lenWord[i].y = 0 - (lenWord[i].size * 8 + random(10, 20));
+          lenWord[i].x = random(0, 128);
+          lenWord[i].speed = random(2, 4);
+        };
+        for (int j = 0; j < lenWord[i].size; j++) {
+          display.setCursor(lenWord[i].x, lenWord[i].y + j * 8);
+          display.write(lenWord[i].c[j]);
+        };
+        lenWord[i].y+=lenWord[i].speed;
+      };
+      delay(50);
     }
   }
   if (mode == DETAIL) {
