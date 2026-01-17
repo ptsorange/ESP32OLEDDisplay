@@ -21,9 +21,20 @@
 
 // モード
 #define HOME 0
+#define SCREEN_SAVER 2
 #define DETAIL 1
 #define SETTING 3
+
+#define MAX_SCREEN_SAVER_MODE 1
+
 uint8_t mode = HOME;
+uint8_t screenSaverMode = 0;
+
+// DVD Bounce variables
+int dvd_x = 10;
+int dvd_y = 10;
+int dvd_dx = 3;
+int dvd_dy = 3;
 
 // 天気データ
 float currentTemp = 0;
@@ -95,6 +106,15 @@ void pressButton(int command) {
   if (command == HOME) {
     if (mode == HOME) {
       getWeatherData();
+    }
+  }
+  if (command == SCREEN_SAVER) {
+    if (mode == SCREEN_SAVER) {
+      if (screenSaverMode >= 0) {
+        screenSaverMode = 0;
+      } else {
+        screenSaverMode++;
+      }
     }
   }
   if (command == SETTING) {
@@ -192,6 +212,33 @@ void loop() {
 
     delay(200); // 更新頻度
   }
+  if (mode == SCREEN_SAVER) {
+    if (screenSaverMode == 0) {
+      dvd_x += dvd_dx;
+      dvd_y += dvd_dy;
+
+      // Check collision with screen edges
+      // Text size 2 is approx 36x16 pixels for "DVD"
+      if (dvd_x <= 0 || dvd_x >= SCREEN_WIDTH - 36) {
+        dvd_dx = -dvd_dx;
+        // Clamp position to stay within screen
+        if (dvd_x < 0) dvd_x = 0;
+        if (dvd_x > SCREEN_WIDTH - 36) dvd_x = SCREEN_WIDTH - 36;
+      }
+
+      if (dvd_y <= 0 || dvd_y >= SCREEN_HEIGHT - 16) {
+        dvd_dy = -dvd_dy;
+        if (dvd_y < 0) dvd_y = 0;
+        if (dvd_y > SCREEN_HEIGHT - 16) dvd_y = SCREEN_HEIGHT - 16;
+      }
+
+      display.setTextSize(2);
+      display.setCursor(dvd_x, dvd_y);
+      display.print("DVD");
+
+      delay(100);
+    }
+  }
   if (mode == DETAIL) {
     display.setCursor(0, 0);
     display.setTextSize(1);
@@ -220,7 +267,7 @@ void loop() {
     display.println(WiFi.localIP());
 
     display.print("LIGHT: ");
-    display.print(nowBrightness+1);
+    display.print(nowBrightness + 1);
     display.println("/5");
     delay(200);
   }
