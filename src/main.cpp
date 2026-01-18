@@ -16,11 +16,11 @@
 // WiFi
 #define WIFI_ANIMATION_WIDTH 48
 #define WIFI_ANIMATION_HEIGHT 48
-#define WIFI_ANIMATION_COUNT 28
+#define WIFI_ANIMATION_COUNT 29
 #define WIFI_ANIMATION_DELAY 100
 
 // Weather
-#define WEATHER_ANIMATION_COUNT 30
+#define WEATHER_ANIMATION_COUNT 28
 #define WEATHER_ANIMATION_DELAY 100
 
 // モード
@@ -256,7 +256,8 @@ void loop() {
     } else if (currentWeather == "Snow") {
       icon = icon_weather_snow;
     }
-    display.drawBitmap(96, 32, icon[frame % WEATHER_ANIMATION_COUNT], 32, 32, SSD1306_WHITE);
+    display.drawBitmap(96, 32, icon[frame % WEATHER_ANIMATION_COUNT], 32, 32,
+                       SSD1306_WHITE);
     frame = (frame + 1) % WEATHER_ANIMATION_COUNT;
 
     delay(WEATHER_ANIMATION_DELAY); // 更新頻度
