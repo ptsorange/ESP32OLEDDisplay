@@ -19,6 +19,10 @@
 #define WIFI_ANIMATION_COUNT 28
 #define WIFI_ANIMATION_DELAY 100
 
+// Weather
+#define WEATHER_ANIMATION_COUNT 30
+#define WEATHER_ANIMATION_DELAY 100
+
 // モード
 #define HOME 0
 #define SCREEN_SAVER 2
@@ -239,7 +243,23 @@ void loop() {
     display.setCursor(0, 52);
     display.printf("Temp: %.1f C", currentTemp);
 
-    delay(200); // 更新頻度
+    // 天気アイコン表示
+    const unsigned char (*icon)[128] = icon_weather_cloudy; // Default
+    if (currentWeather == "Clear") {
+      icon = icon_weather_sunny;
+    } else if (currentWeather == "Clouds") {
+      icon = icon_weather_cloudy;
+    } else if (currentWeather == "Rain" || currentWeather == "Drizzle") {
+      icon = icon_weather_rain;
+    } else if (currentWeather == "Thunderstorm") {
+      icon = icon_weather_thunderstorm;
+    } else if (currentWeather == "Snow") {
+      icon = icon_weather_snow;
+    }
+    display.drawBitmap(96, 32, icon[frame % WEATHER_ANIMATION_COUNT], 32, 32, SSD1306_WHITE);
+    frame = (frame + 1) % WEATHER_ANIMATION_COUNT;
+
+    delay(WEATHER_ANIMATION_DELAY); // 更新頻度
   }
   if (mode == SCREEN_SAVER) {
     if (screenSaverMode == 0) {
