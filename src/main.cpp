@@ -25,7 +25,7 @@
 #define DETAIL 1
 #define SETTING 3
 
-#define MAX_SCREEN_SAVER_MODE 1
+#define MAX_SCREEN_SAVER_MODE 2
 
 uint8_t mode = HOME;
 uint8_t screenSaverMode = 0;
@@ -153,6 +153,12 @@ void pressButton(int command) {
   mode = command;
 }
 
+void calculationEndPoint(float angle, int length, int &x, int &y) {
+  float rad = (angle - 90) * DEG_TO_RAD;
+  x = 64 + cos(rad) * length;
+  y = 32 + sin(rad) * length;
+}
+
 void setup() {
   Serial.begin(115200);
 
@@ -274,9 +280,28 @@ void loop() {
           display.setCursor(lenWord[i].x, lenWord[i].y + j * 8);
           display.write(lenWord[i].c[j]);
         };
-        lenWord[i].y+=lenWord[i].speed;
+        lenWord[i].y += lenWord[i].speed;
       };
       delay(50);
+    }
+    if (screenSaverMode == 2) {
+      struct tm timeinfo;
+      if (!getLocalTime(&timeinfo)) {
+        return;
+      }
+      int secLineX, secLineY;
+      int minLineX, minLineY;
+      int hourLineX, hourLineY;
+
+      calculationEndPoint(timeinfo.tm_sec * 6, 20, secLineX, secLineY);
+      calculationEndPoint(timeinfo.tm_min * 6, 40, minLineX, minLineY);
+      calculationEndPoint((timeinfo.tm_hour % 12) * 30 + timeinfo.tm_min * 0.5,
+                          25, hourLineX, hourLineY);
+
+      display.drawLine(64, 32, secLineX, secLineY, SSD1306_WHITE);
+      display.drawLine(64, 32, minLineX, minLineY, SSD1306_WHITE);
+      display.drawLine(64, 32, hourLineX, hourLineY, SSD1306_WHITE);
+      display.drawCircle(64, 32, 2, SSD1306_WHITE);
     }
   }
   if (mode == DETAIL) {
