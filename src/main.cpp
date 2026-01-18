@@ -289,19 +289,27 @@ void loop() {
       if (!getLocalTime(&timeinfo)) {
         return;
       }
+      display.drawCircle(64, 32, 31, SSD1306_WHITE);
+      for (int i = 0; i < 12; i++) {
+        int sx, sy, ex, ey;
+        calculationEndPoint(i * 30, 27, sx, sy);
+        calculationEndPoint(i * 30, 31, ex, ey);
+        display.drawLine(sx, sy, ex, ey, SSD1306_WHITE);
+      }
+
       int secLineX, secLineY;
       int minLineX, minLineY;
       int hourLineX, hourLineY;
 
-      calculationEndPoint(timeinfo.tm_sec * 6, 20, secLineX, secLineY);
-      calculationEndPoint(timeinfo.tm_min * 6, 40, minLineX, minLineY);
+      calculationEndPoint(timeinfo.tm_sec * 6, 25, secLineX, secLineY);
+      calculationEndPoint(timeinfo.tm_min * 6, 22, minLineX, minLineY);
       calculationEndPoint((timeinfo.tm_hour % 12) * 30 + timeinfo.tm_min * 0.5,
-                          25, hourLineX, hourLineY);
+                          15, hourLineX, hourLineY);
 
       display.drawLine(64, 32, secLineX, secLineY, SSD1306_WHITE);
       display.drawLine(64, 32, minLineX, minLineY, SSD1306_WHITE);
       display.drawLine(64, 32, hourLineX, hourLineY, SSD1306_WHITE);
-      display.drawCircle(64, 32, 2, SSD1306_WHITE);
+      display.fillCircle(64, 32, 2, SSD1306_WHITE);
     }
   }
   if (mode == DETAIL) {
